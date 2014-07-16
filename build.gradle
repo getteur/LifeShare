@@ -1,16 +1,25 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
     repositories {
         mavenCentral()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
+
     }
+/*
+    dependencies {
+        compile files('libs/metadata-extractor-2.6.4-src.jar')
+
+    }
+*/
 }
 
 allprojects {
     repositories {
         mavenCentral()
+    }
+    dependencies {
     }
 }

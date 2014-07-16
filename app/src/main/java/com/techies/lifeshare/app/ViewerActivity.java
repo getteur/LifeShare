@@ -6,12 +6,15 @@ import com.techies.lifeshare.app.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import java.util.Date;
 
@@ -24,12 +27,22 @@ import java.util.Date;
  */
 public class ViewerActivity extends Activity {
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
-        run();
+
     }
+
+
+    public void buttonOnClick(View v){
+        Intent intent = new Intent(v.getContext(),PhotoActivity.class);
+
+        startActivity(intent);
+    }
+
 
 
     public void run(){

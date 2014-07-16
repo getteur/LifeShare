@@ -21,13 +21,14 @@ public class PhotoMetaReader {
 
     public static Date getPhotoDate(Drawable photo){
         //String imageUri = "drawable://" + R.drawable.mock_photo;
+       // String imageUri = "C:\\Users\\Techies\\.AndroidStudioBeta\\LifeShare\\app\\src\\main\\res\\drawable-hdpi\\mock_photo.jpg";
         String imageUri = "C:\\Users\\Techies\\.AndroidStudioBeta\\LifeShare\\app\\src\\main\\res\\drawable-hdpi\\mock_photo.jpg";
         ExifInterface exif = null;
         try{
             exif = new ExifInterface(imageUri);
             SimpleDateFormat  format = new SimpleDateFormat("dd-MM-yyyy'T'HH:mm");
-            Object var= ExifInterface.TAG_DATETIME;
-            Date date = format.parse(exif.getAttribute(ExifInterface.TAG_DATETIME));
+            Object obj = exif.TAG_DATETIME;
+            Date date = format.parse(exif.TAG_DATETIME);
             System.out.println(date);
             return date;
         }catch (Exception e){

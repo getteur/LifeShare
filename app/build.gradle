@@ -19,9 +19,10 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:19.+'
-    compile 'com.android.support:support-v4:19.+'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile files('src/main/libs/metadata-extractor-2.6.4-src.jar')
     compile files('libs/metadata-extractor-2.6.4-src.jar')
+    compile 'com.android.support:appcompat-v7:19.+'
+    // You must install or update the Support Repository through the SDK manager to use this dependency.
+    compile 'com.android.support:support-v4:19.+'
 }
