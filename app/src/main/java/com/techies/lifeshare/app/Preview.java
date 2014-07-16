@@ -2,20 +2,32 @@ package com.techies.lifeshare.app;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.os.Environment;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Techies on 09/07/2014.
  */
 public class Preview extends SurfaceView implements  SurfaceHolder.Callback{
+    static final String TAG = "Preview";
 
     SurfaceHolder mHolder;
     Camera mCamera;
+    protected static final int MEDIA_TYPE_IMAGE = 0;
+    Context currentContext;
 
     private Camera.ShutterCallback shutterCallback =
             new Camera.ShutterCallback() {
@@ -36,10 +48,18 @@ public class Preview extends SurfaceView implements  SurfaceHolder.Callback{
     private Camera.PictureCallback jpegCallback =
             new Camera.PictureCallback() {
                 public void onPictureTaken(byte[] data, Camera c) {
-                    // start the camera preview
+                    try {
 
-                    // work with the jpeg data
-                    // ...
+                        File file = new File(getAlbumStorageDir("LifeShare"), "testPhoto.jpg");
+
+                        file.createNewFile();
+
+                        FileOutputStream outputStream = new FileOutputStream(file);
+                        outputStream.write(data);
+                        outputStream.close();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             };
     /**
@@ -59,12 +79,21 @@ public class Preview extends SurfaceView implements  SurfaceHolder.Callback{
 
     Preview(Context context) {
         super(context);
+        currentContext = context;
 
         mHolder = getHolder();
         mHolder.addCallback(this);
     }
 
-
+    public File getAlbumStorageDir(String albumName) {
+        // Get the directory for the user's public pictures directory.
+        File file = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM), albumName);
+        if (!file.mkdirs()) {
+            Log.e(TAG, "Directory not created");
+        }
+        return file;
+    }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -88,7 +117,7 @@ public class Preview extends SurfaceView implements  SurfaceHolder.Callback{
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         Camera.Parameters parameters = mCamera.getParameters();
         parameters.setPreviewSize(w, h);
-        mCamera.setParameters(parameters);
+//        mCamera.setParameters(parameters);
         mCamera.startPreview();
     }
 
