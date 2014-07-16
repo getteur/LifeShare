@@ -4,9 +4,12 @@ import com.techies.lifeshare.app.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,6 +23,7 @@ import android.widget.ImageView;
 
 import com.techies.lifeshare.app.R;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +60,7 @@ public class PhotoActivity extends Activity {
         startActivityForResult(mediaChooser, REQUEST_IMAGE_CAPTURE);
 
 
+
     }
 
     private void dispatchTakePictureIntent() {
@@ -66,13 +71,11 @@ public class PhotoActivity extends Activity {
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Bitmap imageBitmap;
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             try {
-                Uri imageUri = data.getData();
-                imageBitmap = (Bitmap) extras.get("data");
-
+                Bitmap photo = (Bitmap) extras.get("data");
+                postProcess(getPhotoPath(photo));
                 Log.e("", "");
             }catch (Exception e){
                 e.printStackTrace();
@@ -80,6 +83,42 @@ public class PhotoActivity extends Activity {
 
         }
     }
+
+    public String getPhotoPath(Bitmap photo){
+        // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
+        Uri tempUri = getImageUri(getApplicationContext(), photo);
+        // CALL THIS METHOD TO GET THE ACTUAL PATH
+        String photoPath = getRealPathFromURI(tempUri);
+        return photoPath;
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+    public String getRealPathFromURI(Uri uri) {
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        cursor.moveToFirst();
+        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+        return cursor.getString(idx);
+    }
+
+    public void postProcess(String photoFilePath){
+        File file = new File(photoFilePath);
+        if(file.exists()) {
+            getDate();
+            //getGPSCoordinates();
+        }
+    }
+
+    public Date getDate(){
+        Date date = new Date();
+        return date;
+    }
+
 /*
     private File createImageFile() throws IOException {
         // Create an image file name
