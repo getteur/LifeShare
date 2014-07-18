@@ -34,6 +34,8 @@ public class ViewerActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
 
+
+
     }
 
 

@@ -1,5 +1,6 @@
 package com.techies.lifeshare.app;
 
+import com.techies.lifeshare.app.PhotoUtils.PhotoPosition;
 import com.techies.lifeshare.app.util.SystemUiHider;
 
 import android.annotation.TargetApi;
@@ -8,6 +9,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Build;
@@ -20,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.techies.lifeshare.app.R;
 
@@ -36,12 +41,20 @@ import java.util.Date;
  *
  * @see SystemUiHider
  */
-public class PhotoActivity extends Activity {
+public class PhotoActivity extends Activity implements LocationListener{
 
     private Preview mPreview;
     private ImageView mImageView;
-    String mCurrentPhotoPath;
+    private String mCurrentPhotoPath;
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    protected LocationManager locationManager;
+    protected LocationListener locationListener;
+    protected Context context;
+    TextView txtLat;
+    String lat;
+    String provider;
+    protected String latitude,longitude;
+    protected boolean gps_enabled,network_enabled;
 
 
     @Override
@@ -56,11 +69,36 @@ public class PhotoActivity extends Activity {
         mPreview = new Preview(this);
         setContentView(mPreview);
         */
+        /*
         Intent mediaChooser =  new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(mediaChooser, REQUEST_IMAGE_CAPTURE);
+        */
+        setContentView(R.layout.activity_photo);
+        txtLat = (TextView) findViewById(R.id.textview1);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+    }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        txtLat = (TextView) findViewById(R.id.textview1);
+        txtLat.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
+    }
 
+    @Override
+    public void onProviderDisabled(String provider) {
+        Log.d("Latitude","disable");
+    }
 
+    @Override
+    public void onProviderEnabled(String provider) {
+        Log.d("Latitude","enable");
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.d("Latitude","status");
     }
 
     private void dispatchTakePictureIntent() {
@@ -110,8 +148,12 @@ public class PhotoActivity extends Activity {
         File file = new File(photoFilePath);
         if(file.exists()) {
             getDate();
-            //getGPSCoordinates();
+            getGPSCoordinates();
         }
+    }
+
+    private void getGPSCoordinates() {
+        Log.e("", "");
     }
 
     public Date getDate(){
