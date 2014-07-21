@@ -1,6 +1,7 @@
 package com.techies.lifeshare.app;
 
 import com.techies.lifeshare.app.PhotoUtils.PhotoPosition;
+import com.techies.lifeshare.app.util.MockLocation;
 import com.techies.lifeshare.app.util.SystemUiHider;
 
 import android.annotation.TargetApi;
@@ -9,9 +10,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Build;
@@ -34,6 +40,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static android.media.ExifInterface.*;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -69,34 +77,37 @@ public class PhotoActivity extends Activity implements LocationListener{
         mPreview = new Preview(this);
         setContentView(mPreview);
         */
-        /*
+
         Intent mediaChooser =  new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(mediaChooser, REQUEST_IMAGE_CAPTURE);
-        */
         setContentView(R.layout.activity_photo);
+        /*
         txtLat = (TextView) findViewById(R.id.textview1);
+        MockLocation mock = new MockLocation(LocationManager.GPS_PROVIDER, this);
+        mock.pushLocation(-11.34, 23.45);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,this);
+        */
     }
 
-    @Override
+
     public void onLocationChanged(Location location) {
         txtLat = (TextView) findViewById(R.id.textview1);
         txtLat.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
     }
 
-    @Override
+
     public void onProviderDisabled(String provider) {
         Log.d("Latitude","disable");
     }
 
-    @Override
+
     public void onProviderEnabled(String provider) {
         Log.d("Latitude","enable");
 
     }
 
-    @Override
+
     public void onStatusChanged(String provider, int status, Bundle extras) {
         Log.d("Latitude","status");
     }
@@ -147,19 +158,86 @@ public class PhotoActivity extends Activity implements LocationListener{
     public void postProcess(String photoFilePath){
         File file = new File(photoFilePath);
         if(file.exists()) {
-            getDate();
+            Date datePhoto = getDate();
             getGPSCoordinates();
-        }
-    }
+            getOrientation();
+            File folder = new File(Environment.getExternalStorageDirectory() + "/temp");
+            boolean success = true;
+            if (!folder.exists()) {
+                success = folder.mkdir();
+            }
+            if (success) {
+                String fileName = file.getName();
+                File tempFile = new File(folder.getAbsolutePath() + fileName);
+               file.renameTo(tempFile);
+            }
 
-    private void getGPSCoordinates() {
-        Log.e("", "");
+            try {
+                ExifInterface exifPhoto = new ExifInterface(file.getName());
+                exifPhoto.setAttribute(ExifInterface.TAG_DATETIME,datePhoto.toString());
+                exifPhoto.setAttribute(ExifInterface.TAG_GPS_LATITUDE,"-11.34");
+                exifPhoto.setAttribute(ExifInterface.TAG_GPS_LONGITUDE,"23.45");
+                Log.e("", "");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        }
     }
 
     public Date getDate(){
         Date date = new Date();
         return date;
     }
+
+    public void getGPSCoordinates() {
+
+        Log.e("", "");
+    }
+
+    public float[] getOrientation(){
+        SensorManager sensorManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
+
+        final float[] mValuesMagnet      = new float[3];
+        final float[] mValuesAccel       = new float[3];
+        final float[] mValuesOrientation = new float[3];
+        final float[] mRotationMatrix    = new float[9];
+
+        final SensorEventListener mEventListener = new SensorEventListener() {
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            }
+
+            public void onSensorChanged(SensorEvent event) {
+                // Handle the events for which we registered
+                switch (event.sensor.getType()) {
+                    case Sensor.TYPE_ACCELEROMETER:
+                        System.arraycopy(event.values, 0, mValuesAccel, 0, 3);
+                        break;
+
+                    case Sensor.TYPE_MAGNETIC_FIELD:
+                        System.arraycopy(event.values, 0, mValuesMagnet, 0, 3);
+                        break;
+                }
+            };
+        };
+
+        setListners(sensorManager, mEventListener);
+
+        SensorManager.getRotationMatrix(mRotationMatrix, null, mValuesAccel, mValuesMagnet);
+        SensorManager.getOrientation(mRotationMatrix, mValuesOrientation);
+
+        return mValuesOrientation;
+    }
+
+    public void setListners(SensorManager sensorManager, SensorEventListener mEventListener)
+    {
+        sensorManager.registerListener(mEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(mEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+                SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
 
 /*
     private File createImageFile() throws IOException {
