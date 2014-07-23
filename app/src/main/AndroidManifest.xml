@@ -5,7 +5,7 @@
     <uses-sdk android:minSdkVersion="17"/>
 
     <uses-feature android:name="android.hardware.camera"
-                  android:required="true" />
+        android:required="true" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <uses-permission android:name="android.permission.CAMERA" />
@@ -35,8 +35,7 @@
             android:name=".PhotoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_photo"
-            android:theme="@style/FullscreenTheme"
-            android:screenOrientation="landscape">
+            android:theme="@style/FullscreenTheme">
         </activity>
     </application>
 

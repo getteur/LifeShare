@@ -1,6 +1,7 @@
 package com.techies.lifeshare.app;
 
 import com.techies.lifeshare.app.PhotoUtils.PhotoMetaReader;
+import com.techies.lifeshare.app.Service.LocationService;
 import com.techies.lifeshare.app.Service.PhotoService;
 import com.techies.lifeshare.app.util.SystemUiHider;
 
@@ -27,29 +28,20 @@ import java.util.Date;
  */
 public class ViewerActivity extends Activity {
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
-
-
-
+        LocationService.getInstance(this);
     }
-
 
     public void buttonOnClick(View v){
         Intent intent = new Intent(v.getContext(),PhotoActivity.class);
-
         startActivity(intent);
     }
 
-
-
     public void run(){
         Date date = PhotoMetaReader.getPhotoDate(PhotoService.getMockDrawable(this));
-
     }
 
 }

@@ -6,6 +6,7 @@
     tools:context="com.techies.lifeshare.app.PhotoActivity">
 
     <TextView
+        android:text="Test text"
         android:id="@+id/textview1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

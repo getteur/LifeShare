@@ -1,4 +1,4 @@
-package com.techies.lifeshare.app.util;
+package com.techies.lifeshare.app.Service;
 
 import android.annotation.TargetApi;
 import android.content.Context;
