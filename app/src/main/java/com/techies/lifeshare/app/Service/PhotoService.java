@@ -74,6 +74,8 @@ public class PhotoService extends Activity{
                 File tempFile = new File(getAlbumStorageDir("LifeShare").getAbsolutePath()+"/"+photoFile.getName());
                 photoFile.renameTo(tempFile);
 
+                ExifInterface exifTemp = new ExifInterface(tempFile.getName());
+
                 Log.e("", "");
             } catch (IOException e) {
                 e.printStackTrace();

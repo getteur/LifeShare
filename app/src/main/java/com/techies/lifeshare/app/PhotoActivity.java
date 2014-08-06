@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Window;
 
+import java.io.ByteArrayOutputStream;
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -44,6 +46,8 @@ public class PhotoActivity extends Activity {
             Bundle extras = data.getExtras();
             try {
                 Bitmap photo = (Bitmap) extras.get("data");
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                photo.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                 photoService.savePhoto(photo);
             }catch (Exception e){
                 e.printStackTrace();

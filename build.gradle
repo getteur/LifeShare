@@ -8,12 +8,12 @@ buildscript {
         classpath 'com.android.tools.build:gradle:0.12.+'
 
     }
-/*
+
     dependencies {
         compile files('libs/metadata-extractor-2.6.4-src.jar')
-
+        compile files('libs/chilkat.jar')
     }
-*/
+
 }
 
 allprojects {

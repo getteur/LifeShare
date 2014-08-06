@@ -65,6 +65,7 @@
     <orderEntry type="library" exported="" name="metadata-extractor-2.6.4-src" level="project" />
     <orderEntry type="library" exported="" name="1_metadata-extractor-2.6.4-src" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-19.1.0" level="project" />
+    <orderEntry type="library" exported="" name="chilkat" level="project" />
   </component>
 </module>
 
