@@ -26,14 +26,14 @@ public class MockLocation {
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    public void pushLocation(double lat, double lon) {
+    public void pushLocation(double lat, double lon,double alt) {
         LocationManager lm = (LocationManager) ctx.getSystemService(
                 Context.LOCATION_SERVICE);
 
         Location mockLocation = new Location(providerName);
         mockLocation.setLatitude(lat);
         mockLocation.setLongitude(lon);
-        mockLocation.setAltitude(0);
+        mockLocation.setAltitude(alt);
         mockLocation.setAccuracy(0);
         mockLocation.setTime(System.currentTimeMillis());
         mockLocation.setElapsedRealtimeNanos(5);

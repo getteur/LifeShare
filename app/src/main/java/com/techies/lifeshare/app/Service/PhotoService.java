@@ -15,6 +15,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -32,16 +33,21 @@ import java.util.Date;
 public class PhotoService extends Activity{
 
     protected Context context;
+    private OrientationService orientationService;
 
     private static final String TAG = "PhotoService";
 
     public PhotoService(Context ctx){
+
         context = ctx;
+        orientationService = new OrientationService(context);//lancer les sensor listeners avant de récupérer les valeurs d'orientation de l'appareil
+        //il faudra aussi lancer les location listeners lorsqu'on n'aura plus besoin de mockLocation...
     }
 
     public void savePhoto(Bitmap photo){
         String photoPath = getPhotoPath(photo);
         postProcess(photoPath);
+        Log.e("","");
     }
 
     public static Drawable getMockDrawable(Context currentContext){
@@ -61,25 +67,16 @@ public class PhotoService extends Activity{
     private void postProcess(String photoFilePath){
         File photoFile = new File(photoFilePath);
         if(photoFile.exists()) {
-            Date datePhoto = getDate();
+            Date photoDate = getDate();
             double[] photoCoordinates = getGPSCoordinates();
             float[] photoOrientation = getOrientation();
-            try {
-                ExifInterface exifPhoto = new ExifInterface(photoFile.getName());
-                exifPhoto.setAttribute(ExifInterface.TAG_DATETIME,datePhoto.toString());
-                exifPhoto.setAttribute(ExifInterface.TAG_GPS_LATITUDE,String.valueOf(photoCoordinates[0]));
-                exifPhoto.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, String.valueOf(photoCoordinates[1]));
-                exifPhoto.saveAttributes();
-
-                File tempFile = new File(getAlbumStorageDir("LifeShare").getAbsolutePath()+"/"+photoFile.getName());
-                photoFile.renameTo(tempFile);
-
-                ExifInterface exifTemp = new ExifInterface(tempFile.getName());
-
-                Log.e("", "");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Bundle metaBundle = new Bundle();
+            metaBundle.putString("photoDate",photoDate.toString());
+            metaBundle.putDoubleArray("photoCoordinates", photoCoordinates);
+            metaBundle.putFloatArray("photoOrientation",photoOrientation);
+            PhotoMetaWriter photoMetaWriter = new PhotoMetaWriter();
+            photoMetaWriter.metaWrite(photoFile,metaBundle);
+            Log.e("","");
         }
     }
 
@@ -112,53 +109,20 @@ public class PhotoService extends Activity{
 
     private double[] getGPSCoordinates() {
         Location currentLocation = LocationService.getInstance(context).getCurrentLocation();
-        double[] coordinates = new double[2];
+        double[] coordinates = new double[3];
         if(currentLocation != null){
             coordinates[0] = currentLocation.getLatitude();
             coordinates[1] = currentLocation.getLongitude();
+            coordinates[2] = currentLocation.getAltitude();
         }
         return coordinates;
     }
 
     private float[] getOrientation(){
-        SensorManager sensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE);
 
-        final float[] mValuesMagnet      = new float[3];
-        final float[] mValuesAccel       = new float[3];
-        final float[] mValuesOrientation = new float[3];
-        final float[] mRotationMatrix    = new float[9];
+        return orientationService.getOrientationValues();
 
-        final SensorEventListener mEventListener = new SensorEventListener() {
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            }
-
-            public void onSensorChanged(SensorEvent event) {
-                // Handle the events for which we registered
-                switch (event.sensor.getType()) {
-                    case Sensor.TYPE_ACCELEROMETER:
-                        System.arraycopy(event.values, 0, mValuesAccel, 0, 3);
-                        break;
-
-                    case Sensor.TYPE_MAGNETIC_FIELD:
-                        System.arraycopy(event.values, 0, mValuesMagnet, 0, 3);
-                        break;
-                }
-            };
-        };
-
-        setListeners(sensorManager, mEventListener);
-
-        SensorManager.getRotationMatrix(mRotationMatrix, null, mValuesAccel, mValuesMagnet);
-        SensorManager.getOrientation(mRotationMatrix, mValuesOrientation);
-
-        return mValuesOrientation;
     }
 
-    private void setListeners(SensorManager sensorManager, SensorEventListener mEventListener)
-    {
-        sensorManager.registerListener(mEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(mEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-                SensorManager.SENSOR_DELAY_NORMAL);
-    }
+
 }

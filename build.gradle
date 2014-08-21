@@ -10,8 +10,7 @@ buildscript {
     }
 
     dependencies {
-        compile files('libs/metadata-extractor-2.6.4-src.jar')
-        compile files('libs/chilkat.jar')
+
     }
 
 }

@@ -1,5 +1,6 @@
 package com.techies.lifeshare.app;
 
+import com.techies.lifeshare.app.Service.OrientationService;
 import com.techies.lifeshare.app.Service.PhotoService;
 import com.techies.lifeshare.app.util.SystemUiHider;
 
@@ -32,6 +33,7 @@ public class PhotoActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         // Create our Preview view and set it as the content of our activity.
 
+
         photoService = new PhotoService(this);
 
         Intent mediaChooser =  new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -54,9 +56,6 @@ public class PhotoActivity extends Activity {
             }
         }
     }
-
-
-
 
 
 }

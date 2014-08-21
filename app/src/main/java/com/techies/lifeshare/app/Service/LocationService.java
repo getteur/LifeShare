@@ -33,7 +33,7 @@ public class LocationService implements LocationListener {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
         MockLocation mock = new MockLocation(LocationManager.GPS_PROVIDER, currentContext);
-        mock.pushLocation(-12.34, 23.45);
+        mock.pushLocation(-12.34, 23.45,600.98);
     }
 
     public Location getCurrentLocation(){
